@@ -6,12 +6,9 @@ import { DniVerificationStrategy } from "../Validador/DniVerificationStrategy";
 import { EmailVerificationStrategy } from "../Validador/EmailVerificationStrategy";
 import { PasswordVerificationStrategy } from "../Validador/PasswordVerificationStrategy";
 import { PhoneVerificationStrategy } from "../Validador/PhoneVerificationStrategy";
+import { Response } from "../../../Interfaces/Response";
 
-interface Response {
-    mensaje: string,
-    res: boolean,
-    usuario?:any
-}
+
 
 class UsuarioClass {
     private nombre: string;
@@ -97,7 +94,7 @@ class UsuarioClass {
             });
 
             if (usuario) {
-                return { mensaje: "Usuario verificado correctamente", res: true, usuario: usuario };
+                return { mensaje: "Usuario verificado correctamente", res: true, data: usuario };
             } else {
                 return { mensaje: "Nombre de usuario o contraseña incorrectos", res: false };
             }
@@ -115,7 +112,7 @@ class UsuarioClass {
               }
             })
             if(usuario){
-              return { mensaje: "Usuario existe",res:true,usuario:usuario};
+              return { mensaje: "Usuario existe",res:true,data:usuario};
         
             }else{
               return { mensaje: "Usuario no existe",res:false };
@@ -173,7 +170,7 @@ class UsuarioClass {
                 return { mensaje: "Usuario no encontrado", res: false };
             }
       
-            return { mensaje: "Usuario actualizado", res: true, usuario: usuario };
+            return { mensaje: "Usuario actualizado", res: true, data: usuario };
       
         } catch (e) {
             console.error("Error al realizar la operación: ", e);
@@ -224,7 +221,7 @@ class UsuarioClass {
               return { mensaje: "Usuario no encontrado", res: false };
             }
         
-            return { mensaje: "Usuario encontrado", res: true,usuario:usuario };
+            return { mensaje: "Usuario encontrado", res: true,data:usuario };
           }catch(e){
             console.error("Error al realizar la operación: ", e);
             return { mensaje: "Error interno en el servidor", res: false };
