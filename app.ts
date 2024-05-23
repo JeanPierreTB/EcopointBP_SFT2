@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { Application } from 'express';
 import usuarioEndpoints from './src/Endpoints/EndpointsUsuario/Endpoints_Usuario';
 import puntodereciclajendpoints from './src/Endpoints/EndpointsPuntodeReciclaje/Endpoints_Puntodereciclaje';
+import ComentarioEndpoints from './src/Endpoints/EndpointsComentario/EndpointsComentario';
 import cors from 'cors';
 import { sequelize } from './database/database';
 
@@ -24,6 +25,7 @@ const verificarconexion = async () => {
 
 usuarioEndpoints(app);
 puntodereciclajendpoints(app);
+ComentarioEndpoints(app);
 
 app.get('/', (req: Request, res: Response) => {
     res.send('¡Servidor de Ecopint!');
