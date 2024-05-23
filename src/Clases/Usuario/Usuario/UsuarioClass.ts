@@ -13,8 +13,8 @@ import { Response } from "../../../Interfaces/Response";
 class UsuarioClass {
     private nombre: string;
     private contrasena: string;
-    private dni: number;
-    private ntelefono: number;
+    private dni: number|null;
+    private ntelefono: number|null;
     private puntaje: number;
     private foto: string;
     private id:number;
@@ -39,24 +39,55 @@ class UsuarioClass {
 
     private verifiacion(usuario:UsuarioClass):boolean{
       console.log("Entre aqui..")
-      const verificationStrategy = new Validador(new DniVerificationStrategy());
-      const dnivalor=verificationStrategy.verify(usuario.dni.toString());
+      console.log(usuario);
+      if(usuario.dni===0 && usuario.contrasena==="" && usuario.ntelefono===0){
+        console.log("")
+        console.log("No Deberia")
+
+        const verificationStrategy = new Validador(new EmailVerificationStrategy());
+        const emailvalor=verificationStrategy.verify(usuario.nombre);
+        usuario.contrasena="";
+        usuario.dni=null;
+        usuario.ntelefono=null;
+        return emailvalor; 
+
+
+      }
+      else if(usuario.contrasena==="Indefinido"){
+        console.log("Deberia")
+        const verificationStrategy = new Validador(new DniVerificationStrategy());
+        const dnivalor=verificationStrategy.verify(usuario.dni!.toString());
+
+        verificationStrategy.setVerificationStrategy(new PhoneVerificationStrategy());
+        const phonevalor=verificationStrategy.verify(usuario.ntelefono!.toString());
+        usuario.contrasena="";
+        return (dnivalor && phonevalor);
+      }
       
-      verificationStrategy.setVerificationStrategy(new EmailVerificationStrategy());
-      const emailvalor=verificationStrategy.verify(usuario.nombre)
+      else{
+        console.log("No Deberia 2")
 
-      verificationStrategy.setVerificationStrategy(new PasswordVerificationStrategy);
-      const passwordvalor=verificationStrategy.verify(usuario.contrasena)
+        const verificationStrategy = new Validador(new DniVerificationStrategy());
+        const dnivalor=verificationStrategy.verify(usuario.dni!.toString());
+      
+        verificationStrategy.setVerificationStrategy(new EmailVerificationStrategy());
+        const emailvalor=verificationStrategy.verify(usuario.nombre)
+
+        verificationStrategy.setVerificationStrategy(new PasswordVerificationStrategy);
+        const passwordvalor=verificationStrategy.verify(usuario.contrasena)
         
-      verificationStrategy.setVerificationStrategy(new PhoneVerificationStrategy());
-      const phonevalor=verificationStrategy.verify(usuario.ntelefono.toString());
-      console.log(dnivalor);
-      console.log(emailvalor);
-      console.log(passwordvalor);
-      console.log(phonevalor);
+        verificationStrategy.setVerificationStrategy(new PhoneVerificationStrategy());
+        const phonevalor=verificationStrategy.verify(usuario.ntelefono!.toString());
+        console.log(dnivalor);
+        console.log(emailvalor);
+        console.log(passwordvalor);
+        console.log(phonevalor);
 
-      return(dnivalor && emailvalor && passwordvalor && phonevalor); 
+        return(dnivalor && emailvalor && passwordvalor && phonevalor); 
 
+      }
+      
+      
 
     }
 
@@ -86,12 +117,15 @@ class UsuarioClass {
 
     async verificarusuario(): Promise<Response> {
         try {
+          console.log("Nombres"+this.nombre);
+          console.log("Contrasena"+this.contrasena);
             const usuario = await Usuario.findOne({
                 where: {
                     nombre: this.nombre,
                     contrasena: this.contrasena,
                 },
             });
+            console.log("usuario:"+usuario)
 
             if (usuario) {
                 return { mensaje: "Usuario verificado correctamente", res: true, data: usuario };

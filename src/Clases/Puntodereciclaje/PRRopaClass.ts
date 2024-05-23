@@ -3,20 +3,22 @@ import { PuntodereciclajeClass } from "./PuntodereciclajeClass";
 import { Punto } from "../../../models/Punto";
 import { Punto_Usuario } from "../../../models/Punto_Usuario";
 import { Usuario } from "../../../models/Usuario";
+import qrcode from 'qrcode';
+
 
 export class PRRopaClass extends PuntodereciclajeClass{
     constructor(puntodereciclajedata:{
         latitud:number;
         longitud:number;
         lugar:string;
-        id:number;
+        id:number|null;
     }){
         super(puntodereciclajedata);
     }
 
     async realizarpunto(id_usuario: number, id: number): Promise<Response> {
         try {
-            // Buscar el punto
+            console.log("ID FINAL",id_usuario);
             const punto = await Punto.findOne({
               where: {
                 id: id,
@@ -73,7 +75,7 @@ export class PRRopaClass extends PuntodereciclajeClass{
         
               
             
-              const puntajenuevo=usuario.puntaje+(cantidad*4);
+              const puntajenuevo=usuario.puntaje+(cantidad*5);
         
 
               const usuarioActualizado = await Usuario.update(
@@ -131,5 +133,35 @@ export class PRRopaClass extends PuntodereciclajeClass{
             console.error("Error al realizar la operación: ", e);
             return { mensaje: "Error interno en el servidor", res: false };
           }
+    }
+    async agregarpunto(): Promise<Response> {
+      try {
+    
+        const qrCodeData = JSON.stringify({
+          latitud: this.latitud,
+          longitud: this.longitud,
+          lugar: this.lugar,
+          tipo:"Ropa"
+        });
+    
+        const qrCodeBase64 = await qrcode.toDataURL(qrCodeData);
+    
+        const newpunto = await Punto.create({
+          latitud: this.latitud,
+          longitud: this.longitud,
+          lugar: this.lugar,
+          codigoqr: qrCodeBase64,
+          tipo:"Ropa"
+        });
+    
+        return {
+          mensaje: 'Punto creado',
+          res: true,
+          data: qrCodeBase64 
+        };
+      } catch (e) {
+        console.error('Error al crear punto: ', e);
+        return{ mensaje: 'Error interno en el servidor', res: false };
+      }
     }
 }

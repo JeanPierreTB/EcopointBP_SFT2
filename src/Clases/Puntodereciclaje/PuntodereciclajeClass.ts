@@ -1,20 +1,20 @@
 import { Punto } from "../../../models/Punto";
 import { Response } from "../../Interfaces/Response";
 import { Punto_Usuario } from "../../../models/Punto_Usuario";
-import { Op } from 'sequelize/types';
+import { Op } from 'sequelize';
 
 
 export abstract class PuntodereciclajeClass{
     public latitud:number;
     public longitud:number;
     public lugar:string;
-    public id:number;
+    public id:number|null;
 
     constructor(puntodereciclajedata:{
         latitud:number;
         longitud:number;
         lugar:string;
-        id:number;
+        id:number|null;
     }){
         this.latitud=puntodereciclajedata.latitud;
         this.longitud=puntodereciclajedata.longitud;
@@ -35,6 +35,7 @@ export abstract class PuntodereciclajeClass{
     }
 
     static async obtenerpuntosarealizar(usuario:number):Promise<Response>{
+      console.log("id"+usuario);
         try {
             const puntosUsuario = await Punto_Usuario.findAll({
               where:{
@@ -64,7 +65,7 @@ export abstract class PuntodereciclajeClass{
     static async puntocancelado(lugar:string,id:number):Promise<Response>{
         try{
             
-            const punto=await Punto.findOne({
+            const punto:any=await Punto.findOne({
               where:{
                 lugar:lugar
               }
@@ -75,7 +76,8 @@ export abstract class PuntodereciclajeClass{
         
             const Punto_Usuario1=await Punto_Usuario.destroy({
               where:{
-                PuntoId:id,
+                PuntoId:punto.id,
+                UsuarioId:id
               }
             })
         
@@ -93,7 +95,7 @@ export abstract class PuntodereciclajeClass{
 
     abstract realizarpunto(id_usuario:number,id:number):Promise<Response>;
     abstract puntorealizadoqr(lugarseleccionado:string,cantidad:number,id:number):Promise<Response>
-
+    abstract agregarpunto():Promise<Response>
 
 
     

@@ -43,8 +43,8 @@ export default function puntodereciclajendpoints(app:any){
 
     app.post('/obtener-punto-realizar',async(req:any,res:any)=>{
         try{
-            const usuariodata=req.body
-            const resultado=await PuntodereciclajeClass.obtenerpuntosarealizar(usuariodata);
+            const {usuario}=req.body
+            const resultado=await PuntodereciclajeClass.obtenerpuntosarealizar(usuario);
             res.status(200).json(resultado);
         }catch(e:any){
             console.error("Error al insertar el usuario: ", e.message);
@@ -56,6 +56,7 @@ export default function puntodereciclajendpoints(app:any){
     app.post('/punto-cancelado',async(req:any,res:any)=>{
         try{
             const {lugar,id}=req.body;
+            console.log(req.body);
             const resultado=await PuntodereciclajeClass.puntocancelado(lugar,id);
             res.status(200).json(resultado);
         }catch(e:any){
@@ -67,7 +68,10 @@ export default function puntodereciclajendpoints(app:any){
 
     app.post('/realizar-punto', async (req:any, res:any) => {
         try {
-            const { tipo, punto, id_usuario, id } = req.body;
+            console.log("Body,"+req.body.id_usuario);
+            const { tipo, punto, idu, id } = req.body;
+
+            
 
             const puntotipo = fabricapunto(tipo);
             if (!puntotipo) {
@@ -75,7 +79,8 @@ export default function puntodereciclajendpoints(app:any){
             }
 
             const objetopunto = puntotipo.crearpuntodereciclaje(punto);
-            const respuesta = await objetopunto.realizarpunto(id_usuario, id);
+            console.log("Objetnto final"+objetopunto);
+            const respuesta = await objetopunto.realizarpunto(idu, id);
             res.status(200).json(respuesta);
 
         } catch (e:any) {
@@ -86,7 +91,15 @@ export default function puntodereciclajendpoints(app:any){
 
     app.post('/punto-cancelado-qr',async(req:any,res:any)=>{
         try{
-            const {tipo,punto,lugarseleccionado,cantidad,id}=req.body;
+            //const {punto,id}=req.body;
+            const {id,tipo,lugarseleccionado,latitud,longitud,lugar,cantidad}=req.body;
+
+            const punto={
+                id:id,
+                latitud:latitud,
+                longitud:longitud,
+                lugar:lugar,
+            }
             const puntotipo=fabricapunto(tipo);
             if(!puntotipo){
                 throw new Error("Tipo de material no valido");
@@ -97,6 +110,30 @@ export default function puntodereciclajendpoints(app:any){
             res.status(200).json(respuesta)
             
             
+        }catch (e:any) {
+            console.error("Error al realizar el punto de reciclaje: ", e.message);
+            res.status(500).json({ mensaje: "Error interno en el servidor", res: false });
+        }
+    })
+
+
+    app.post('/agregar-punto',async(req:any,res:any)=>{
+        try{
+            const {latitud,longitud,lugar,tipo}=req.body;
+            console.log(req.body);
+            const punto={
+                id:null,
+                latitud:req.body.latitud,
+                longitud:req.body.longitud,
+                lugar:req.body.lugar,
+            }
+            const puntotipo=fabricapunto(tipo);
+            if(!puntotipo){
+                throw new Error("Tipo de material no valido");
+            }
+            const objetopunto=puntotipo.crearpuntodereciclaje(punto);
+            const respuesta=await objetopunto.agregarpunto();
+            res.status(200).json(respuesta);
         }catch (e:any) {
             console.error("Error al realizar el punto de reciclaje: ", e.message);
             res.status(500).json({ mensaje: "Error interno en el servidor", res: false });

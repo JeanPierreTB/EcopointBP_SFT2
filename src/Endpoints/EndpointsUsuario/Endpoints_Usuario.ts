@@ -17,6 +17,7 @@ export default function usuarioEndpoints(app:any) {
   app.post("/verificar-usuario",async(req:any,res:any)=>{
     try {
       const usuarioData = req.body;
+      console.log(usuarioData);
       const usuario = new UsuarioClass(usuarioData);
       const resultado = await usuario.verificarusuario();
       res.status(200).json(resultado);

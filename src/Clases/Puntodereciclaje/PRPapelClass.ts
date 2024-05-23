@@ -3,13 +3,14 @@ import { PuntodereciclajeClass } from "./PuntodereciclajeClass";
 import { Punto } from "../../../models/Punto";
 import { Punto_Usuario } from "../../../models/Punto_Usuario";
 import { Usuario } from "../../../models/Usuario";
+import qrcode from 'qrcode';
 
 export class PRPapelClass extends PuntodereciclajeClass{
     constructor(puntodereciclajedata:{
         latitud:number;
         longitud:number;
         lugar:string;
-        id:number;
+        id:number|null;
     }){
         super(puntodereciclajedata);
     }
@@ -131,5 +132,36 @@ export class PRPapelClass extends PuntodereciclajeClass{
             console.error("Error al realizar la operación: ", e);
             return { mensaje: "Error interno en el servidor", res: false };
           }
+    }
+
+    async agregarpunto(): Promise<Response> {
+      try {
+    
+        const qrCodeData = JSON.stringify({
+          latitud: this.latitud,
+          longitud: this.longitud,
+          lugar: this.lugar,
+          tipo:"Papel"
+        });
+    
+        const qrCodeBase64 = await qrcode.toDataURL(qrCodeData);
+    
+        const newpunto = await Punto.create({
+          latitud: this.latitud,
+          longitud: this.longitud,
+          lugar: this.lugar,
+          codigoqr: qrCodeBase64,
+          tipo:"Papel"
+        });
+    
+        return {
+          mensaje: 'Punto creado',
+          res: true,
+          data: qrCodeBase64 
+        };
+      } catch (e) {
+        console.error('Error al crear punto: ', e);
+        return{ mensaje: 'Error interno en el servidor', res: false };
+      }
     }
 }
