@@ -9,6 +9,9 @@ import { PhoneVerificationStrategy } from "../Validador/PhoneVerificationStrateg
 import { Response } from "../../../Interfaces/Response";
 import { Objetivo } from "../../../../models/Objetivo";
 import { Objetivo_Usuario } from "../../../../models/Objetivo_Usuario";
+import { Usuario_Usuario } from "../../../../models/Usuario_Usuario";
+import { Op } from "sequelize";
+import Sequelize from "sequelize";
 
 
 class UsuarioClass {
@@ -315,6 +318,70 @@ class UsuarioClass {
             console.error("Error al realizar la operación: ", e);
             return { mensaje: "Error interno en el servidor", res: false };
           }
+    }
+
+    static async obtenerranking():Promise<Response>{
+      try{
+        const usuarios=await Usuario.findAll({
+          order:[['puntaje','DESC']]
+        })
+    
+    
+        return { mensaje: "Rankings de usuarios", res: true,data:usuarios};
+    
+    
+      }catch(e){
+        console.error("Error al realizar la operación: ", e);
+        return { mensaje: "Error interno en el servidor", res: false };
+      }
+    }
+
+    static async obtenernoamigos(id:number):Promise<Response>{
+      try{
+        const usuario=await Usuario_Usuario.findAll({
+          where:{
+            UsuarioAId:id
+            
+          }
+        })
+        
+    
+        const usuario2=await Usuario_Usuario.findAll({
+          where:{
+            UsuarioBId:id
+          }
+        })
+    
+        const idsAmigos = usuario.map((user:any) => parseInt(user.UsuarioBId));
+        const idsAmigos2 = usuario2.map((user:any) => parseInt(user.UsuarioAId));
+        idsAmigos.push(...idsAmigos2);
+        idsAmigos.push(id);
+    
+    
+    
+        const usuariosNoAmigos = await Usuario.findAll({
+          where: {
+            id: { 
+              [Sequelize.Op.notIn]: idsAmigos
+            }
+          }
+        });
+    
+        if(!usuario){
+          return { mensaje: "Usuarios no encontrado", res: false };
+        }
+    
+        return { mensaje: "Usuarios encontrado", res: true,data:usuariosNoAmigos };
+    
+    
+    
+    
+    
+    
+      }catch(e){
+        console.error("Error al realizar la operación: ", e);
+        return { mensaje: "Error interno en el servidor", res: false };
+      }
     }
 
 

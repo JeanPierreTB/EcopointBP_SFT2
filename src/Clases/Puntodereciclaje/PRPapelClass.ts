@@ -76,7 +76,7 @@ export class PRPapelClass extends PuntodereciclajeClass{
             
               const puntajenuevo=usuario.puntaje+(cantidad*3);
         
-
+              //150+3*300
               const usuarioActualizado = await Usuario.update(
                 { 
                   puntaje: puntajenuevo

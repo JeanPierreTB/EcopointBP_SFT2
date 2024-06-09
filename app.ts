@@ -6,6 +6,7 @@ import ComentarioEndpoints from './src/Endpoints/EndpointsComentario/EndpointsCo
 import ConsejosEndpoints from './src/Endpoints/EndpointsConsejos/EndpointsConsejos';
 import recompesaendpoints from './src/Endpoints/EndpointsRecompesa/Endpoints_Recompesa';
 import objetivoEndpoints from './src/Endpoints/EndpointsObjetivo/EndpointsObjetivo';
+import NotifiacionEndpoints from './src/Endpoints/EndpointsNotificacion/EndpointsNotificacion';
 import { Recompesa } from './models/Recompesa';
 import { Usuario } from './models/Usuario';
 import { Objetivo_Usuario } from './models/Objetivo_Usuario';
@@ -69,6 +70,7 @@ ComentarioEndpoints(app);
 ConsejosEndpoints(app);
 recompesaendpoints(app);
 objetivoEndpoints(app);
+NotifiacionEndpoints(app);
 
 app.get('/', (req: Request, res: Response) => {
     res.send('¡Servidor de Ecopint!');

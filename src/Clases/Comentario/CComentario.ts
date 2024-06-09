@@ -12,6 +12,7 @@ export class CComentario extends Comentarioclass{
       
             const fechaHoy = new Date();
             const fechaHoySinHora = fechaHoy.toISOString().split('T')[0];
+            console.log(fechaHoySinHora);
         
             const nuevocomentario=await Comentario.create({
               des:this.getdes(),
