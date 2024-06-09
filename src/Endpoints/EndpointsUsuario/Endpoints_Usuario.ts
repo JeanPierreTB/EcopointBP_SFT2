@@ -122,6 +122,48 @@ export default function usuarioEndpoints(app:any) {
       res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
     }
   })
+
+  app.post('/misamigos',async(req:any,res:any)=>{
+    try{
+     
+      const resultado=await UsuarioClass.misamigos(req.body.id);
+      res.status(201).json(resultado);
+  
+    }catch(e){
+      console.error("Error al realizar la operación: ", e);
+      res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
+    }
+  })
+
+  app.post('/agregar-amigos',async(req:any,res:any)=>{
+    try{
+      const {nombre,idusuario,nombre1,foto,des,tipo}=req.body;
+      const resultado=await UsuarioClass.agregaramigos(idusuario,nombre,nombre1,foto,des,tipo);
+      res.status(201).json(resultado);
+      
+  
+  
+  
+    }catch(e){
+      console.error("Error al realizar la operación: ", e);
+      res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
+    }
+  })
+
+
+app.post('/amigo-rechazado',async(req:any,res:any)=>{
+  try{
+
+    const {nombre,nombre1,foto,des,tipo}=req.body;
+    const resultado=await UsuarioClass.amigorechazado(nombre,nombre1,foto,des,tipo);
+    res.status(201).json(resultado);
+
+
+  }catch(e){
+    console.error("Error al realizar la operación: ", e);
+    res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
+  }
+})
   
 
 

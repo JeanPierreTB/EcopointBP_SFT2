@@ -46,4 +46,34 @@ export default function ComentarioEndpoints(app:any){
             res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
         }
     })
+
+    app.post('/recuperar-comentariouau',async(req:any,res:any)=>{
+        try{
+      
+        const resultado=await Comentarioclass.recuperarchatusuario(req.body.id_usuario,req.body.id_amigo);
+        res.status(200).json(resultado);
+
+        
+      
+        }catch(e){
+          console.error("Error al realizar la operación: ", e);
+          res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
+        }
+      })
+
+      app.post('/agregar-comentariouau',async(req:any,res:any)=>{
+        try{
+        
+        const {des,tipo,id_usuario,id_amigo}=req.body;
+        const resultado=await Comentarioclass.agregarcomentariopersonal(id_usuario,id_amigo,tipo,des);
+        res.status(200).json(resultado);
+         
+      
+      
+          
+        }catch(e){
+          console.error("Error al realizar la operación: ", e);
+          res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
+        }
+      })
 }

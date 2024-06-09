@@ -30,6 +30,26 @@ class Notifiaciones{
             return { mensaje: "Error interno en el servidor", res: false };
           }
     }
+
+    static async vernotificaciones(id:number):Promise<Response>{
+        try{
+            const noti=await Notifiacion.findAll({
+              where:{
+                idUsuario:id
+              },
+              
+            })
+        
+            if(!noti){
+              return { mensaje: "Notificaciones no encontradas", res: false };
+            }
+        
+            return { mensaje: "Notificaciones encontradas", res: true,data:noti };
+          }catch(e){
+            console.error("Error al realizar la operación: ", e);
+            return { mensaje: "Error interno en el servidor", res: false };
+          }
+    }
 }
 
 export {Notifiaciones}

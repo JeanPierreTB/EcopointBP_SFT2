@@ -10,6 +10,7 @@ import { Response } from "../../../Interfaces/Response";
 import { Objetivo } from "../../../../models/Objetivo";
 import { Objetivo_Usuario } from "../../../../models/Objetivo_Usuario";
 import { Usuario_Usuario } from "../../../../models/Usuario_Usuario";
+import { Notifiacion } from "../../../../models/Notificacion";
 import { Op } from "sequelize";
 import Sequelize from "sequelize";
 
@@ -376,6 +377,146 @@ class UsuarioClass {
     
     
     
+    
+    
+      }catch(e){
+        console.error("Error al realizar la operación: ", e);
+        return { mensaje: "Error interno en el servidor", res: false };
+      }
+    }
+
+    static async misamigos(id:number):Promise<Response>{
+      try{
+   
+    
+        const amigos=await Usuario_Usuario.findAll({
+          where:{
+            UsuarioAId:id
+          }
+        })
+        
+    
+        if(amigos.length===0){
+          
+          const amigos2=await Usuario_Usuario.findAll({
+            where:{
+              UsuarioBId:id
+            }
+          })
+    
+          const amistades2=amigos2.map((amigo:any)=>amigo.UsuarioAId);
+          const amistadesinfo=await Usuario.findAll({
+            where:{
+              id:{
+                [Op.in]:amistades2
+              }
+            }
+          })
+          return { mensaje: "Amigos encontrados", res: true, data:amistadesinfo };
+    
+          
+    
+        }
+        else{
+          const amistades=amigos.map((amigo:any)=>amigo.UsuarioBId);
+          const amistadesinfo=await Usuario.findAll({
+            where:{
+              id:{
+                [Op.in]:amistades
+              }
+            }
+          })
+    
+         return { mensaje: "Amigos encontrados", res: true, data:amistadesinfo };
+    
+    
+    
+        }
+    
+        
+    
+        
+        
+    
+    
+      }catch(e){
+        console.error("Error al realizar la operación: ", e);
+        return { mensaje: "Error interno en el servidor", res: false };
+      }
+    
+    }
+
+    static async agregaramigos(id_usuario:number,nombre:string,nombre1:string,foto:string,des:string,tipo:number):Promise<Response>{
+      try{
+
+        const usuarioi:any=await Usuario.findOne({
+          where:{
+            nombre:nombre
+          }
+        })
+    
+        const fechaHoy = new Date();
+        const fechaHoySinHora = fechaHoy.toISOString().split('T')[0];
+    
+        const usuario=await Usuario_Usuario.create({
+          UsuarioAId:id_usuario,
+          UsuarioBId:usuarioi.id,
+          fecha:fechaHoySinHora
+        })
+    
+        /*const usuario1=await Usuario_Usuario.create({
+          UsuarioAId:usuarioi.id,
+          UsuarioBId:req.body.idusuario
+        })*/
+    
+        const noti=await Notifiacion.destroy({
+          where:{
+            nombre:nombre
+          }
+        })
+    
+        const noti2=await Notifiacion.create({
+          nombre:nombre1,
+          foto:foto,
+          des:des,
+          tipo:tipo,
+          idUsuario:usuarioi.id,
+        })
+    
+        return { mensaje: "Amigo agregado", res: true,data:usuario};
+    
+    
+    
+      }catch(e){
+        console.error("Error al realizar la operación: ", e);
+        return { mensaje: "Error interno en el servidor", res: false };
+      }
+    }
+
+    static async amigorechazado(nombre:string,nombre1:string,foto:string,des:string,tipo:number):Promise<Response>{
+      try{
+
+        const usuario:any=await Usuario.findOne({
+          where:{
+            nombre:nombre
+          }
+        })
+        const noti=await Notifiacion.destroy({
+          where:{
+            nombre:nombre
+          }
+        })
+        
+    
+        const noti2=await Notifiacion.create({
+          nombre:nombre1,
+          foto:foto,
+          des:des,
+          tipo:tipo,
+          idUsuario:usuario.id,
+        })
+    
+        return { mensaje: "Amigo rechazado", res: true };
     
     
       }catch(e){

@@ -13,4 +13,14 @@ export default function NotifiacionEndpoints(app:any){
           res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
         }
       })
+
+      app.post('/ver-notifiaciones',async(req:any,res:any)=>{
+        try{
+          const resultado=await Notifiaciones.vernotificaciones(req.body.id);
+          res.status(200).json(resultado)
+        }catch(e){
+          console.error("Error al realizar la operación: ", e);
+          res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
+        }
+      })
 }
