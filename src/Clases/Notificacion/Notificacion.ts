@@ -15,15 +15,23 @@ class Notifiaciones{
 
     async agregarnotifiacionamigo(idf:number):Promise<Response>{
         try{
-            const noti=await Notifiacion.create({
-              des:this.des,
-              tipo:this.tipo,
-              idUsuario:idf,
-              nombre:this.nombre,
-              foto:this.foto
-            })
-        
-            return { mensaje: "Notificacion agregada", res: true,data:noti };
+
+            if(this.des==="Usted ha ganado el premio de la semana"){
+                
+                return {mensaje:"Notifiacion ya existe",res:false};
+            }
+            else{
+                const noti=await Notifiacion.create({
+                    des:this.des,
+                    tipo:this.tipo,
+                    idUsuario:idf,
+                    nombre:this.nombre,
+                    foto:this.foto
+                  })
+              
+                  return { mensaje: "Notificacion agregada", res: true,data:noti };
+            }
+            
         
           }catch(e){
             console.error("Error al realizar la operación: ", e);
