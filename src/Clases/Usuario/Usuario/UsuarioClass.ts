@@ -7,7 +7,8 @@ import { EmailVerificationStrategy } from "../Validador/EmailVerificationStrateg
 import { PasswordVerificationStrategy } from "../Validador/PasswordVerificationStrategy";
 import { PhoneVerificationStrategy } from "../Validador/PhoneVerificationStrategy";
 import { Response } from "../../../Interfaces/Response";
-
+import { Objetivo } from "../../../../models/Objetivo";
+import { Objetivo_Usuario } from "../../../../models/Objetivo_Usuario";
 
 
 class UsuarioClass {
@@ -96,12 +97,20 @@ class UsuarioClass {
 
         if(this.verifiacion(this)){
           try {
-            const userinfo = await Usuario.create({
+            const userinfo:any = await Usuario.create({
                 nombre: this.nombre,
                 contrasena: this.contrasena,
                 dni: this.dni,
                 ntelefono: this.ntelefono
             });
+            const objetivos=await Objetivo.findAll({})
+
+            const registrosObjetivoUsuario = objetivos.map((objetivo:any) => ({
+              UsuarioId: userinfo.id,
+              ObjetivoId: objetivo.id,
+            }));
+
+            await Objetivo_Usuario.bulkCreate(registrosObjetivoUsuario);
             return { mensaje: "Usuario creado", res: true };
 
         } catch (error) {
