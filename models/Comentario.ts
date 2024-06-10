@@ -16,6 +16,10 @@ export const Comentario=sequelize.define("Comentario",{
     },
     fecha:{
         type:DataTypes.DATEONLY
+    },
+    aprobado:{
+        type:DataTypes.BOOLEAN,
+        defaultValue:false
     }
 },{
     freezeTableName:true,

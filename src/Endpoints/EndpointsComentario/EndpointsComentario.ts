@@ -1,3 +1,4 @@
+import { CAdministradorFactory } from "../../Clases/Comentario/CAdministradorFactory";
 import { CComentarioFactory } from "../../Clases/Comentario/CComentarioFactory";
 import { CSoporteFactory } from "../../Clases/Comentario/CSoporteFactory";
 import { CSugerenciaFactory } from "../../Clases/Comentario/CSugerenciaFactory";
@@ -14,6 +15,8 @@ export default function ComentarioEndpoints(app:any){
                 return comentariotipo=new CComentarioFactory();
             case 3:
                 return comentariotipo=new CSugerenciaFactory();
+            case 5:
+                return comentariotipo=new CAdministradorFactory();
             default:
                 return null;
         }

@@ -13,6 +13,9 @@ import { Usuario_Usuario } from "../../../../models/Usuario_Usuario";
 import { Notifiacion } from "../../../../models/Notificacion";
 import { Op } from "sequelize";
 import Sequelize from "sequelize";
+import { Comentario } from "../../../../models/Comentario";
+import { Consejo } from "../../Consejos/Consejos";
+import { Consejos } from "../../../../models/Consejo";
 
 
 class UsuarioClass {
@@ -23,6 +26,7 @@ class UsuarioClass {
     private puntaje: number;
     private foto: string;
     private id:number;
+    private rol:string;
 
     constructor(usuarioData: {
         nombre: string;
@@ -32,6 +36,7 @@ class UsuarioClass {
         puntaje?: number;
         foto?: string;
         id?:number;
+        rol?:string;
     }) {
         this.nombre = usuarioData.nombre;
         this.contrasena = usuarioData.contrasena;
@@ -40,6 +45,7 @@ class UsuarioClass {
         this.puntaje = usuarioData.puntaje || 0;
         this.foto = usuarioData.foto || 'https://static.vecteezy.com/system/resources/previews/027/728/804/non_2x/faceless-businessman-user-profile-icon-business-leader-profile-picture-portrait-user-member-people-icon-in-flat-style-circle-button-with-avatar-photo-silhouette-free-png.png';
         this.id=usuarioData.id || 0
+        this.rol=usuarioData.rol || 'Cliente'
     }
 
     private verifiacion(usuario:UsuarioClass):boolean{
@@ -101,12 +107,15 @@ class UsuarioClass {
 
         if(this.verifiacion(this)){
           try {
-            const userinfo:any = await Usuario.create({
+            let userinfo:any;
+            if(this.rol==='Cliente'){
+              userinfo = await Usuario.create({
                 nombre: this.nombre,
                 contrasena: this.contrasena,
                 dni: this.dni,
                 ntelefono: this.ntelefono
             });
+
             const objetivos=await Objetivo.findAll({})
 
             const registrosObjetivoUsuario = objetivos.map((objetivo:any) => ({
@@ -115,6 +124,18 @@ class UsuarioClass {
             }));
 
             await Objetivo_Usuario.bulkCreate(registrosObjetivoUsuario);
+            }
+
+            else if(this.rol==="Admi"){
+              userinfo = await Usuario.create({
+                nombre: this.nombre,
+                contrasena: this.contrasena,
+                dni: this.dni,
+                ntelefono: this.ntelefono,
+                rol:this.rol
+            });
+            }
+            
             return { mensaje: "Usuario creado", res: true };
 
         } catch (error) {
@@ -521,6 +542,78 @@ class UsuarioClass {
     
       }catch(e){
         console.error("Error al realizar la operación: ", e);
+        return { mensaje: "Error interno en el servidor", res: false };
+      }
+    }
+
+
+    static async aprobarcomentario(com:string):Promise<Response>{
+      try {
+
+      
+        const comentario:any = await Comentario.update(
+          { aprobado: true },
+          {
+            where: {
+              des: com
+            },
+            returning:true
+          }
+        );
+
+        console.log("Comentario:"+comentario.des);
+      
+        if (comentario[0] === 0) {
+          return { mensaje: "Comentario no encontrado", res: false };
+        }
+
+        const comentariofinal=comentario[1][0];
+
+        if(comentariofinal.tipo===2){
+         const diaactual = new Date().getDay() || 7;
+         const consejos:any=await Consejos.findAll({
+          where:{
+            idUsuario:null,
+            dia:diaactual
+          }
+         })
+
+         const ids=consejos.filter((consejo:any)=>consejo.id)
+         const randomIndex = Math.floor(Math.random() * ids.length);
+
+         const randomId = ids[randomIndex].id;
+
+         const consejofinal = await Consejos.update(
+          { des: com,
+            idUsuario:comentariofinal.idUsuario
+           }, 
+          { where: { id: randomId } } 
+        );
+
+
+
+        }
+
+
+        const datausuario:any=await Usuario.findOne({
+          where:{
+            id:comentariofinal.idUsuario
+          }
+        })
+
+        
+
+        const notifiacion=await Notifiacion.create({
+          tipo:0,
+          des:`Comentario :${com} fue aprobado`,
+          idUsuario:comentariofinal.idUsuario,
+          nombre:datausuario.nombre,
+          foto:datausuario.foto
+        })
+      
+        return { mensaje: "Comentario actualizado exitosamente", res: true,data:comentario[1][0]};
+      } catch (e) {
+        console.error("Error al realizar la operacion", e);
         return { mensaje: "Error interno en el servidor", res: false };
       }
     }

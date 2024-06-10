@@ -164,6 +164,19 @@ app.post('/amigo-rechazado',async(req:any,res:any)=>{
     res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
   }
 })
+
+
+app.post('/aprobar-comentario',async(req:any,res:any)=>{
+  try{
+    const {com,id}=req.body;
+    const resultado=await UsuarioClass.aprobarcomentario(com);
+    res.status(201).json(resultado);
+
+  }catch(e){
+    console.error("Error al realizar la operación: ", e);
+    res.status(500).send({ mensaje: "Error interno en el servidor", res: false });
+  }
+})
   
 
 
