@@ -29,4 +29,13 @@ export default function recompesaendpoints(app:any){
           res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
         }
       })
+
+      app.get('/recuperar-recompesas',async(req:any,res:any)=>{
+        try{
+          const resultado=await Recompesas.obtenerultimafecha();
+          res.status(201).json(resultado);
+        }catch(e){
+          res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
+        }
+      })
 }

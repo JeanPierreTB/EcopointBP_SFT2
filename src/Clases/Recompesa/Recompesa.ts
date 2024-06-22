@@ -123,6 +123,20 @@ class Recompesas{
             return { mensaje: 'Error interno en el servidor', res: false };
           }
     }
+
+    static async obtenerultimafecha():Promise<Response>{
+        try{
+            const todaslasrecompesas:any=await Recompesa.findAll({});
+            const ultimfechaultimaRecompesa=todaslasrecompesas[todaslasrecompesas.length-1].fechaFin;
+
+            return { mensaje: 'Recompensa Recuperadas', res: true, data:ultimfechaultimaRecompesa};
+
+
+        }catch(e){
+            console.error('Error al agregar recompensa:', e);
+            return { mensaje: 'Error interno en el servidor', res: false };
+        }
+    }
 }
 
 export {Recompesas}
