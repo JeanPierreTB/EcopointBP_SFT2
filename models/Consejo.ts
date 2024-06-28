@@ -1,27 +1,24 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../database/database";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Usuario } from "./Usuario";
 
-export const Consejos=sequelize.define("Consejos",{
-    id:{
-        type:DataTypes.INTEGER,
-        primaryKey:true,
-        autoIncrement:true
-    },
-    des:{
-        type:DataTypes.TEXT
-    },
-    dia:{
-        type:DataTypes.INTEGER
-    }
-},{
-    freezeTableName:true
-})
+@Table({ tableName: "Consejos", freezeTableName: true })
+export class Consejos extends Model {
+    @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
+    id!: number;
 
-Usuario.hasMany(Consejos,{
-    foreignKey:'idUsuario'
-})
+    @Column({ type: DataType.TEXT })
+    des!: string;
 
-Consejos.belongsTo(Usuario,{
-    foreignKey:'idUsuario'
-})
+    @Column({ type: DataType.INTEGER })
+    dia!: number;
+
+    // Relación belongsTo con Usuario
+    @ForeignKey(() => Usuario)
+    @Column
+    idUsuario!: number;
+
+    @BelongsTo(() => Usuario)
+    usuario!: Usuario;
+}
+
+export default Consejos;

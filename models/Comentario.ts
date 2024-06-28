@@ -1,35 +1,39 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../database/database";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Usuario } from "./Usuario";
+import Usuario_Usuario from "./Usuario_Usuario";
 
-export const Comentario=sequelize.define("Comentario",{
-    id:{
-        type:DataTypes.INTEGER,
-        primaryKey:true,
-        autoIncrement:true
-    },
-    des:{
-        type:DataTypes.TEXT
-    },
-    tipo:{
-        type:DataTypes.INTEGER
-    },
-    fecha:{
-        type:DataTypes.DATEONLY
-    },
-    aprobado:{
-        type:DataTypes.BOOLEAN,
-        defaultValue:false
-    }
-},{
-    freezeTableName:true,
-    timestamps:false
-})
+@Table({ tableName: "Comentario", freezeTableName: true, timestamps: false })
+export class Comentario extends Model {
+    @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
+    id!: number;
 
-Usuario.hasMany(Comentario,{
-    foreignKey:'idUsuario'
-})
+    @Column({ type: DataType.TEXT })
+    des!: string;
 
-Comentario.belongsTo(Usuario,{
-    foreignKey:'idUsuario'
-})
+    @Column({ type: DataType.INTEGER })
+    tipo!: number;
+
+    @Column({ type: DataType.DATEONLY })
+    fecha!: Date;
+
+    @Column({ type: DataType.BOOLEAN, defaultValue: false })
+    aprobado!: boolean;
+
+    // Relación belongsTo con Usuario
+    @ForeignKey(() => Usuario)
+    @Column
+    idUsuario!: number;
+
+    @BelongsTo(() => Usuario)
+    usuario!: Usuario;
+
+    // Relación belongsTo con Usuario_Usuario
+    @BelongsTo(() => Usuario_Usuario, 'idamigo')
+    amigo!: Usuario_Usuario;
+}
+
+
+
+
+
+export default Comentario;

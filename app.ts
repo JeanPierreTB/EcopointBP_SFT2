@@ -1,24 +1,33 @@
 import express, { Request, Response } from 'express';
 import { Application } from 'express';
-import usuarioEndpoints from './src/Endpoints/EndpointsUsuario/Endpoints_Usuario';
-import puntodereciclajendpoints from './src/Endpoints/EndpointsPuntodeReciclaje/Endpoints_Puntodereciclaje';
-import ComentarioEndpoints from './src/Endpoints/EndpointsComentario/EndpointsComentario';
-import ConsejosEndpoints from './src/Endpoints/EndpointsConsejos/EndpointsConsejos';
-import recompesaendpoints from './src/Endpoints/EndpointsRecompesa/Endpoints_Recompesa';
-import objetivoEndpoints from './src/Endpoints/EndpointsObjetivo/EndpointsObjetivo';
-import NotifiacionEndpoints from './src/Endpoints/EndpointsNotificacion/EndpointsNotificacion';
 import { Recompesa } from './models/Recompesa';
 import { Usuario } from './models/Usuario';
 import { Objetivo_Usuario } from './models/Objetivo_Usuario';
 import cors from 'cors';
 import { sequelize } from './database/database';
-
+import routerNotifiacion from './src/Vista/Route.Notificacion';
+import routerObjetivo from './src/Vista/Route.Objetivo';
+import routerPuntodereciclaje from './src/Vista/Route.Puntodereciclaje';
+import routerRecompesa from './src/Vista/Route.Recompesa';
+import routerUsuario from './src/Vista/Route.Usuario';
+import routerComentario from './src/Vista/RouteComentario';
+import routerConsejo from './src/Vista/RouteConsejo';
 
 const app: Application = express(); 
 const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
+
+// Usar las rutas definidas en routes.ts
+app.use('/',routerNotifiacion);
+app.use('/',routerObjetivo);
+app.use('/',routerPuntodereciclaje);
+app.use('/',routerRecompesa);
+app.use('/',routerUsuario);
+app.use('/',routerComentario);
+app.use('/',routerConsejo);
+
 
 const verificarconexion = async () => {
     try {
@@ -64,17 +73,8 @@ const verificardia= async()=>{
   }
 }
 
-usuarioEndpoints(app);
-puntodereciclajendpoints(app);
-ComentarioEndpoints(app);
-ConsejosEndpoints(app);
-recompesaendpoints(app);
-objetivoEndpoints(app);
-NotifiacionEndpoints(app);
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('¡Servidor de Ecopint!');
-});
+
 
 app.listen(PORT, () => {
     console.log(`Servidor Express escuchando en el puerto ${PORT}`);

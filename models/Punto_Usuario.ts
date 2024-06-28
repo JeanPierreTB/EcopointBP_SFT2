@@ -1,31 +1,30 @@
-import { sequelize } from "../database/database";
-import { DataTypes } from "sequelize";
-import { Punto } from "./Punto";
+import { Table, Column, Model, DataType, ForeignKey, BelongsToMany } from "sequelize-typescript";
 import { Usuario } from "./Usuario";
+import { Punto } from "./Punto";
 
-export const Punto_Usuario = sequelize.define(
-  "Punto_Usuario",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    realizado:{
-      type:DataTypes.BOOLEAN
-    },
-    fecha:{
-      type:DataTypes.DATEONLY,
-    },
-    cantidad:{
-      type:DataTypes.INTEGER
-    }
-  },
-  {
-    freezeTableName: true,
-    timestamps: false,
-  }
-);
+@Table({ tableName: "Punto_Usuario", freezeTableName: true, timestamps: false })
+export class Punto_Usuario extends Model {
+    @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
+    id!: number;
 
-Usuario.belongsToMany(Punto, { through: Punto_Usuario });
-Punto.belongsToMany(Usuario, { through: Punto_Usuario });
+    @Column({ type: DataType.BOOLEAN })
+    realizado!: boolean;
+
+    @Column({ type: DataType.DATEONLY })
+    fecha!: Date;
+
+    @Column({ type: DataType.INTEGER })
+    cantidad!: number;
+
+    @ForeignKey(() => Usuario)
+    @Column
+    UsuarioId!: number;
+
+    @ForeignKey(() => Punto)
+    @Column
+    puntoId!: number;
+}
+
+
+
+export default Punto_Usuario;

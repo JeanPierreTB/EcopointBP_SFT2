@@ -1,26 +1,24 @@
-import { sequelize } from "../database/database";
-import { DataTypes } from "sequelize";
+import { Table, Column, Model, DataType, ForeignKey, BelongsToMany } from "sequelize-typescript";
 import { Usuario } from "./Usuario";
 import { Objetivo } from "./Objetivo";
 
-export const  Objetivo_Usuario= sequelize.define(
-  "Objetivo_Usuario",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    porcentaje:{
-        type:DataTypes.INTEGER,
-        defaultValue:0
-    }
-  },
-  {
-    freezeTableName: true,
-    timestamps: false,
-  }
-);
+@Table({ tableName: "Objetivo_Usuario", freezeTableName: true, timestamps: false })
+export class Objetivo_Usuario extends Model {
+    @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
+    id!: number;
 
-Usuario.belongsToMany(Objetivo,{through:Objetivo_Usuario})
-Objetivo.belongsToMany(Usuario,{through:Objetivo_Usuario})
+    @Column({ type: DataType.INTEGER, defaultValue: 0 })
+    porcentaje!: number;
+
+    @ForeignKey(() => Usuario)
+    @Column
+    usuarioId!: number;
+
+    @ForeignKey(() => Objetivo)
+    @Column
+    objetivoId!: number;
+}
+
+
+
+export default Objetivo_Usuario;

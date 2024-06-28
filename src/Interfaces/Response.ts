@@ -3,3 +3,5 @@ export interface Response {
     res: boolean,
     data?:any
 }
+
+

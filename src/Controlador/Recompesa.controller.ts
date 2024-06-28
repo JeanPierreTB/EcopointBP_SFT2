@@ -1,25 +1,13 @@
-import moment from 'moment';
-import { Recompesa } from '../../../models/Recompesa';
+import { Request, Response } from 'express';
+import Recompesa from '../../models/Recompesa';
 import { Op } from 'sequelize';
-import { Response } from '../../Interfaces/Response';
-import { Usuario } from '../../../models/Usuario';
-class Recompesas{
-    private imagen:string;
-    private des:string;
-    private fechai:Date;
-    private fechaf:Date;
-    private puntaje:number
+import moment from 'moment';
+import Usuario from '../../models/Usuario';
 
-    constructor(imagen:string,des:string,fechai:Date,fechaf:Date,puntaje:number){
-        this.imagen=imagen,
-        this.des=des,
-        this.fechai=fechai,
-        this.fechaf=fechaf,
-        this.puntaje=puntaje
 
-    }
+class RecompesaController {
 
-    static async obtenerrecompesasemanal():Promise<Response>{
+    public async obtenerrecompesasemanal(req: Request, res: Response): Promise<Response> {
         try {
           
             const inicioSemana = moment().startOf('isoWeek').subtract(1, 'day');
@@ -38,18 +26,18 @@ class Recompesas{
             
         
             if(!recompensa){
-              return {mensaje:"Recompesa no disponible",res:false,data:recompensa}
+              return res.status(201).json({mensaje:"Recompesa no disponible",res:false,data:recompensa})
             }
         
-            return { mensaje: 'Recompensa semanal obtenida con éxito', res: true, data:recompensa };
+            return res.status(201).json({ mensaje: 'Recompensa semanal obtenida con éxito', res: true, data:recompensa });
           } catch (e) {
             console.error('Error al obtener recompensa semanal:', e);
-            return { mensaje: 'Error interno en el servidor', res: false };
+            return res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
           }
     }
 
-
-    static async obtenerganador(id:number):Promise<Response>{
+    public async obtenerganador(req: Request, res: Response): Promise<Response> {
+        const {id}=req.body;
         try {
             const fechaHoy = new Date();
             const fechaHoySinHora = fechaHoy.toISOString().split('T')[0];
@@ -72,9 +60,9 @@ class Recompesas{
       
             if (recompensa) {
                 if (recompensa.idUsuario === id) {
-                    return { mensaje: 'Recompensa ya obtenida por este usuario', res: true };
+                    return res.status(201).json({ mensaje: 'Recompensa ya obtenida por este usuario', res: true });
                 } else if (recompensa.idUsuario !== null) {
-                    return { mensaje: 'Recompensa ya obtenida por otro usuario', res: true};
+                    return res.status(201).json({ mensaje: 'Recompensa ya obtenida por otro usuario', res: true});
                 } else {
                     if (usuario.puntaje >= recompensa.puntaje) {
                         await Recompesa.update({
@@ -86,57 +74,63 @@ class Recompesas{
                         });
       
                         
-                        return { mensaje: 'Recompensa obtenida', res: true };
+                        return res.status(201).json({ mensaje: 'Recompensa obtenida', res: true });
                     } else {
-                        return { mensaje: 'Recompensa no obtenida, puntaje insuficiente', res: false };
+                        return res.status(201).json({ mensaje: 'Recompensa no obtenida, puntaje insuficiente', res: false });
                     }
                 }
             } else {
-                return { mensaje: 'No hay recompensas disponibles', res: false };
+                return res.status(201).json({ mensaje: 'No hay recompensas disponibles', res: false });
             }
         } catch (error) {
             console.error('Error al obtener recompensa semanal:', error);
-            return { mensaje: 'Error interno en el servidor', res: false };
+            return res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
         }
     }
 
-    async agregarecompesa():Promise<Response>{
+    public async agregarecompesa(req: Request, res: Response): Promise<Response> {
+        const {fechai,fechaf,imagen,des,puntaje}=req.body;
         try {
-            const fechaInicio = new Date(this.fechai);
-            const fechaFin = new Date(this.fechaf);
+            const fechaInicio = new Date(fechai);
+            const fechaFin = new Date(fechaf);
         
             // Obtener solo la parte de la fecha en formato ISO8601 (YYYY-MM-DD)
             const fechaInicioISO = fechaInicio.toISOString().split('T')[0];
             const fechaFinISO = fechaFin.toISOString().split('T')[0];
             
             const nuevaRecompensa = await Recompesa.create({
-              imagen: this.imagen,
-              des: this.des,
+              imagen: imagen,
+              des: des,
               fechaInicio: fechaInicioISO,
               fechaFin:fechaFinISO,
-              puntaje:this.puntaje
+              puntaje:puntaje
             });
         
-            return { mensaje: 'Recompensa agregada con éxito', res: true, data:nuevaRecompensa };
+            return res.status(201).json({ mensaje: 'Recompensa agregada con éxito', res: true, data:nuevaRecompensa });
           } catch (e) {
             console.error('Error al agregar recompensa:', e);
-            return { mensaje: 'Error interno en el servidor', res: false };
+            return res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
           }
     }
 
-    static async obtenerultimafecha():Promise<Response>{
+    public async obtenerultimafecha(req: Request, res: Response): Promise<Response> {
         try{
             const todaslasrecompesas:any=await Recompesa.findAll({});
             const ultimfechaultimaRecompesa=todaslasrecompesas[todaslasrecompesas.length-1].fechaFin;
 
-            return { mensaje: 'Recompensa Recuperadas', res: true, data:ultimfechaultimaRecompesa};
+            return res.status(201).json({ mensaje: 'Recompensa Recuperadas', res: true, data:ultimfechaultimaRecompesa});
 
 
         }catch(e){
             console.error('Error al agregar recompensa:', e);
-            return { mensaje: 'Error interno en el servidor', res: false };
+            return res.json(500).json({ mensaje: 'Error interno en el servidor', res: false });
         }
     }
+
+
+
+
 }
 
-export {Recompesas}
+
+export default new RecompesaController();
