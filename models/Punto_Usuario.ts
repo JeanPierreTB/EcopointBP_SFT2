@@ -22,7 +22,7 @@ export class Punto_Usuario extends Model {
 
     @ForeignKey(() => Punto)
     @Column
-    puntoId!: number;
+    PuntoId!: number;
 }
 
 

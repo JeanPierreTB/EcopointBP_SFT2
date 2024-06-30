@@ -4,7 +4,7 @@ class NotificacionController {
 
     public async agregarnotifiacionamigo(req: Request, res: Response): Promise<Response> {
         try{
-            const {des,tipo,idf,nombre,foto}=req.body;
+            const {des,tipo,idamigo,nombre,foto}=req.body;
             if(des==="Usted ha ganado el premio de la semana"){
                 
                 return res.status(200).json({mensaje:"Notifiacion ya existe",res:false});
@@ -13,7 +13,7 @@ class NotificacionController {
                 const noti=await Notifiacion.create({
                     des:des,
                     tipo:tipo,
-                    idUsuario:idf,
+                    idUsuario:idamigo,
                     nombre:nombre,
                     foto:foto
                   })

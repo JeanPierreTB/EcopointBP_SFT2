@@ -5,9 +5,19 @@ import Punto_Usuario from '../../models/Punto_Usuario';
 import Usuario from '../../models/Usuario';
 import qrcode from 'qrcode';
 
+const puntajesPorTipo: { [key: string]: number } = {
+  "Papel": 2,
+  "Plástico": 3,
+  "Metal": 6,
+  "Baterias": 4,
+  "Ropa": 8
+};
+
 
 
 class PuntodereciclajeController {
+
+  
    
     public async obtenerpuntos(req: Request, res: Response): Promise<Response> {
         try{
@@ -83,23 +93,17 @@ class PuntodereciclajeController {
     }
 
     public async realizarpunto(req: Request, res: Response): Promise<Response> {
-        const {id_usuario,id,tipo}=req.body;
+        const {idu,id,tipo,punto}=req.body;
+        console.log("id Usuario:"+idu);
+        console.log("Id punto:"+id);
+        console.log(tipo);
+        console.log(punto)
         try {
-            console.log("ID FINAL",id_usuario);
-            const punto = await Punto.findOne({
-              where: {
-                id: id,
-                tipo:tipo
-              }
-            });
-        
-            if (!punto) {
-              return res.status(201).json({ mensaje: "Punto no encontrado", res: false });
-            }
+            
         
         
             await Punto_Usuario.create({
-              UsuarioId: id_usuario,
+              UsuarioId: idu,
               PuntoId: id,
               realizado:false,
               cantidad:0
@@ -112,9 +116,20 @@ class PuntodereciclajeController {
           }
     }
 
+    private static calcularPuntajeNuevo(usuario: any, tipo: string, cantidad: number): number {
+      const factor = puntajesPorTipo[tipo];
+      if (factor) {
+        return usuario.puntaje + (cantidad * factor);
+      } else {
+        throw new Error(`Tipo desconocido: ${tipo}`);
+      }
+    }
+
     public async puntorealizadoqr(req: Request, res: Response): Promise<Response> {
 
         const {lugar,lugarseleccionado,latitud,longitud,tipo,id,cantidad}=req.body;
+        console.log(lugar);
+        console.log(lugarseleccionado);
         try{
       
             if(lugarseleccionado===lugar){
@@ -143,11 +158,9 @@ class PuntodereciclajeController {
                 return res.status(404).json({ mensaje: "Usuario no encontrado", res: false });
               }
         
+              const puntajenuevo=PuntodereciclajeController.calcularPuntajeNuevo(usuario,tipo,cantidad);
               
-            
-              const puntajenuevo=usuario.puntaje+(cantidad*5);
-        
-
+      
               const usuarioActualizado = await Usuario.update(
                 { 
                   puntaje: puntajenuevo

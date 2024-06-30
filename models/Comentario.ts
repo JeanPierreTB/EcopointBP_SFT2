@@ -24,12 +24,17 @@ export class Comentario extends Model {
     @Column
     idUsuario!: number;
 
-    @BelongsTo(() => Usuario)
+    @BelongsTo(() => Usuario, 'idUsuario')
     usuario!: Usuario;
 
-    // Relación belongsTo con Usuario_Usuario
-    @BelongsTo(() => Usuario_Usuario, 'idamigo')
-    amigo!: Usuario_Usuario;
+    // Relación belongsTo con Usuario
+    @ForeignKey(() => Usuario)
+    @Column
+    idamigo!: number;
+
+    @BelongsTo(() => Usuario, 'idamigo')
+    amigo!: Usuario;
+
 }
 
 

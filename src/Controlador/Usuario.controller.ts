@@ -21,6 +21,7 @@ class UsuarioController {
       return emailValidado;
     } else if (usuario.contrasena === 'Indefinido') {
       // Verificación por DNI y teléfono si la contraseña es 'Indefinido'
+      console.log("Entro al indefinido")
       const dniValidado = /^\d{8}$/.test(usuario.dni.toString());
       const phoneValidado = /^\d{9}$/.test(usuario.ntelefono.toString());
       return dniValidado && phoneValidado;
@@ -197,16 +198,33 @@ class UsuarioController {
       }
 
       // Actualizar los datos del usuario
-      const usuario = await Usuario.update({
-        nombre,
-        contrasena,
-        dni,
-        ntelefono
-      }, {
-        where: {
-          id
-        }
-      });
+
+      let usuario;
+      if(contrasena==="Indefinido"){
+        usuario = await Usuario.update({
+          nombre:nombre,
+          contrasena:"",
+          dni:dni,
+          ntelefono:ntelefono
+        }, {
+          where: {
+            id
+          }
+        });
+      }
+      else{
+        usuario = await Usuario.update({
+          nombre,
+          contrasena,
+          dni,
+          ntelefono
+        }, {
+          where: {
+            id
+          }
+        });
+      }
+      
 
       if (usuario[0] === 1) {
         return res.status(200).json({ mensaje: 'Datos de usuario actualizados correctamente', res: true });
@@ -272,9 +290,13 @@ class UsuarioController {
           }
         })
     
-        const usuarios=await Usuario.findAll({
-          order:[['puntaje','DESC']]
-        })
+        const usuarios = await Usuario.findAll({
+          where: {
+            rol: "Cliente"
+          },
+          order: [['puntaje', 'DESC']]
+        });
+        
     
         const poscionusuario=usuarios.findIndex((usuario:any)=>(usuario.id===id))
     
@@ -291,9 +313,15 @@ class UsuarioController {
 
   public async rankingusuario(req:Request,res:Response):Promise<any>{
     try{
-        const usuarios=await Usuario.findAll({
-          order:[['puntaje','DESC']]
-        })
+      const usuarios = await Usuario.findAll({
+        where: {
+          rol: "Cliente"
+        },
+        order: [['puntaje', 'DESC']]
+      });
+
+
+      
     
     
         return res.status(200).json({ mensaje: "Rankings de usuarios", res: true,data:usuarios});
@@ -312,7 +340,7 @@ class UsuarioController {
 
         const usuario=await Usuario_Usuario.findAll({
           where:{
-            UsuarioAId:id
+            UsuarioAId:id,
             
           }
         })
@@ -320,7 +348,7 @@ class UsuarioController {
     
         const usuario2=await Usuario_Usuario.findAll({
           where:{
-            UsuarioBId:id
+            UsuarioBId:id,
           }
         })
     
@@ -335,13 +363,17 @@ class UsuarioController {
           where: {
             id: { 
               [Sequelize.Op.notIn]: idsAmigos
-            }
+            },
+            rol:"Cliente"
           }
         });
     
         if(!usuario){
           return res.status(404).json({ mensaje: "Usuarios no encontrado", res: false });
         }
+
+
+
     
         return res.status(200).json({ mensaje: "Usuarios encontrado", res: true,data:usuariosNoAmigos });
     
@@ -420,7 +452,7 @@ class UsuarioController {
 
   public async agregaramigos(req:Request,res:Response):Promise<any>{
     try{
-        const {nombre,id_usuario,nombre1,foto,des,tipo}=req.body;
+        const {nombre,idusuario,nombre1,foto,des,tipo}=req.body;
         const usuarioi:any=await Usuario.findOne({
           where:{
             nombre:nombre
@@ -431,7 +463,7 @@ class UsuarioController {
         const fechaHoySinHora = fechaHoy.toISOString().split('T')[0];
     
         const usuario=await Usuario_Usuario.create({
-          UsuarioAId:id_usuario,
+          UsuarioAId:idusuario,
           UsuarioBId:usuarioi.id,
           fecha:fechaHoySinHora
         })
@@ -505,6 +537,7 @@ class UsuarioController {
     try {
 
         const {com}=req.body;
+        console.log("Comentario final:"+com);
         const comentario:any = await Comentario.update(
           { aprobado: true },
           {
@@ -515,7 +548,7 @@ class UsuarioController {
           }
         );
 
-        console.log("Comentario:"+comentario.des);
+        
       
         if (comentario[0] === 0) {
           return { mensaje: "Comentario no encontrado", res: false };
@@ -523,19 +556,24 @@ class UsuarioController {
 
         const comentariofinal=comentario[1][0];
 
+        console.log("Comentario:"+comentariofinal.idUsuario);
+
+
         if(comentariofinal.tipo===2){
          const diaactual = new Date().getDay() || 7;
          const consejos:any=await Consejos.findAll({
           where:{
-            idUsuario:null,
             dia:diaactual
           }
          })
 
-         const ids=consejos.filter((consejo:any)=>consejo.id)
+
+         const ids=consejos.filter((consejo:any)=>consejo.id);
          const randomIndex = Math.floor(Math.random() * ids.length);
 
          const randomId = ids[randomIndex].id;
+
+
 
          const consejofinal = await Consejos.update(
           { des: com,
@@ -543,6 +581,8 @@ class UsuarioController {
            }, 
           { where: { id: randomId } } 
         );
+
+        console.log("Consejo final:"+consejofinal);
 
 
 

@@ -12,11 +12,11 @@ export class Objetivo_Usuario extends Model {
 
     @ForeignKey(() => Usuario)
     @Column
-    usuarioId!: number;
+    UsuarioId!: number;
 
     @ForeignKey(() => Objetivo)
     @Column
-    objetivoId!: number;
+    ObjetivoId!: number;
 }
 
 

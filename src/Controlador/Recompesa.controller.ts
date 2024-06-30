@@ -89,10 +89,10 @@ class RecompesaController {
     }
 
     public async agregarecompesa(req: Request, res: Response): Promise<Response> {
-        const {fechai,fechaf,imagen,des,puntaje}=req.body;
+        const {fechainicio,fechafin,imagen,des,puntaje}=req.body;
         try {
-            const fechaInicio = new Date(fechai);
-            const fechaFin = new Date(fechaf);
+            const fechaInicio = new Date(fechainicio);
+            const fechaFin = new Date(fechafin);
         
             // Obtener solo la parte de la fecha en formato ISO8601 (YYYY-MM-DD)
             const fechaInicioISO = fechaInicio.toISOString().split('T')[0];
@@ -117,8 +117,14 @@ class RecompesaController {
         try{
             const todaslasrecompesas:any=await Recompesa.findAll({});
             const ultimfechaultimaRecompesa=todaslasrecompesas[todaslasrecompesas.length-1].fechaFin;
+            const fecha = new Date(ultimfechaultimaRecompesa);
 
-            return res.status(201).json({ mensaje: 'Recompensa Recuperadas', res: true, data:ultimfechaultimaRecompesa});
+            // Sumar dos días
+            fecha.setDate(fecha.getDate() + 2);
+
+            // Obtener la nueva fecha con dos días sumados
+            const nuevaFecha = fecha.toISOString().split('T')[0];
+            return res.status(201).json({ mensaje: 'Recompensa Recuperadas', res: true, data:nuevaFecha});
 
 
         }catch(e){

@@ -20,15 +20,24 @@ class ComentarioController {
                   [Op.ne]: 4
                 }
               },
-              include:[
-                {
-                  model:Usuario
-                }
-              ],
               order: [['id', 'ASC']]
             });
+
+            const enviados = (await Promise.all(comentariosHoy.map(async (com: any) => {
+              return await Usuario.findAll({
+                where: {
+                  id: com.idUsuario
+                }
+              });
+            }))).flat();
+
+            const comentariosfinal = {
+              comentarios: comentariosHoy,
+              enviados: enviados,
+            };
+
         
-            return res.status(201).json({ mensaje:"Comentarios obtenidos",res: true,data: comentariosHoy });
+            return res.status(201).json({ mensaje:"Comentarios obtenidos",res: true,data: comentariosfinal });
           } catch (e) {
             console.error("Error al realizar la operación: ", e);
             return res.status(500).json({ mensaje: "Error interno en el servidor", res: false });
@@ -38,6 +47,10 @@ class ComentarioController {
 
     public async agregarcomentariopersonal(req: Request, res: Response): Promise<Response> {
         const {des,tipo,id_usuario,id_amigo}=req.body;
+        console.log(des);
+        console.log(tipo);
+        console.log(id_usuario);
+        console.log(id_amigo);
         try{
 
             const fechaHoy = new Date();
@@ -66,29 +79,41 @@ class ComentarioController {
 
     public async recuperarchatusuario(req: Request, res: Response): Promise<Response> {
         const {id_usuario,id_amigo}=req.body;
+
+        console.log(id_usuario)
+        console.log(id_amigo)
         try{
             const comentario=await Comentario.findAll({
               where:{
                 idUsuario:id_usuario,
                 idamigo:id_amigo
-              },include:[{model:Usuario}]
+              }
             })
       
             const comentario2=await Comentario.findAll({
               where:{
                 idUsuario:id_amigo,
                 idamigo:id_usuario
-              },include:[{model:Usuario}]
+              }
             })
       
-            const comentarios=comentario.concat(comentario2)
-            const comentariosOrdenados = comentarios.sort((a:any, b:any) => a.id - b.id);
-      
-      
-            
-      
-            return res.status(201).json({ mensaje: "info encontrada", res: true,data:comentariosOrdenados });
-      
+            const comentarios = comentario.concat(comentario2);
+            const comentariosOrdenados: any = comentarios.sort((a: any, b: any) => a.id - b.id);
+
+            const enviados = (await Promise.all(comentariosOrdenados.map(async (com: any) => {
+              return await Usuario.findAll({
+                where: {
+                  id: com.idUsuario
+                }
+              });
+            }))).flat();  // Usamos flat() para asegurarnos de que enviados sea un arreglo de una dimensión
+          
+            const comentariosfinal = {
+              comentarios: comentariosOrdenados,
+              enviados: enviados,
+            };
+            return res.status(201).json({ mensaje: "info encontrada", res: true, data: comentariosfinal });
+
       
       
         }catch(e){

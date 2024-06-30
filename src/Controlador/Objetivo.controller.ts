@@ -69,7 +69,7 @@ class ObjetivoController {
                   through: { attributes: ['porcentaje'] },
                   where:{id:id},
                   attributes: { exclude: ['contrasena', 'dni', 'ntelefono', 'puntaje', 'foto', 'createdAt', 'updatedAt','nombre'] }, // Excluir los campos que no deseas enviar
-                  as: 'Usuarios', // Alias para la asociación
+                  as: 'usuarios', // Alias para la asociación
                 }
               ]
             });
@@ -377,10 +377,10 @@ class ObjetivoController {
               puntos:puntos,
               dia:dia
             })
-            return res.json(201).json({mensaje:"Objetivo creado",res:true});
+            return res.status(201).json({mensaje:"Objetivo creado",res:true});
         
           }catch(e){
-            return res.json(500).json({ mensaje: "Error interno en el servidor", res: false });
+            return res.status(500).json({ mensaje: "Error interno en el servidor", res: false });
           }
     }
 

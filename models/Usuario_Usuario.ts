@@ -17,6 +17,8 @@ export class Usuario_Usuario extends Model {
     @ForeignKey(() => Usuario)
     @Column
     UsuarioBId!: number;
+
+    
 }
 
 
