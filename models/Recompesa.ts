@@ -1,5 +1,6 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo,BelongsToMany } from "sequelize-typescript";
 import { Usuario } from "./Usuario";
+import Usuario_Recompesa from "./Usuario_Recompesa";
 
 @Table({ tableName: "Recompesa" })
 export class Recompesa extends Model {
@@ -21,13 +22,14 @@ export class Recompesa extends Model {
     @Column({ type: DataType.INTEGER })
     puntaje!: number;
 
-    // Relación belongsTo con Usuario
-    @ForeignKey(() => Usuario)
-    @Column
-    idUsuario!: number;
+    @Column({type:DataType.INTEGER})
+    stock!:number;
 
-    @BelongsTo(() => Usuario)
-    usuario!: Usuario;
+    // Relación belongsToMany con Usuario a través de Punto_Usuario
+    @BelongsToMany(() => Usuario, () => Usuario_Recompesa)
+    usuarios!: Usuario[];
+
+    
 }
 
 export default Recompesa;

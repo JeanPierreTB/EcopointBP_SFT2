@@ -9,5 +9,7 @@ routerPuntodereciclaje.post('/punto-cancelado',PuntodereciclajeController.puntoc
 routerPuntodereciclaje.post('/realizar-punto',PuntodereciclajeController.realizarpunto);
 routerPuntodereciclaje.post('/punto-cancelado-qr',PuntodereciclajeController.puntorealizadoqr);
 routerPuntodereciclaje.post('/agregar-punto',PuntodereciclajeController.agregarpunto);
+routerPuntodereciclaje.post('/agregar-categoria',PuntodereciclajeController.agregarcategoria);
+routerPuntodereciclaje.get('/obtener-categorias',PuntodereciclajeController.obtenercategorias);
 
 export default routerPuntodereciclaje;

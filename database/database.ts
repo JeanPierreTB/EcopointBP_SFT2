@@ -9,11 +9,13 @@ import Objetivo_Usuario from "../models/Objetivo_Usuario";
 import Punto_Usuario from "../models/Punto_Usuario";
 import Punto from "../models/Punto";
 import Usuario_Usuario from "../models/Usuario_Usuario";
+import Usuario_Recompesa from "../models/Usuario_Recompesa";
+import CategoriaPunto from "../models/CategoriaPunto";
 
 export const sequelize=new Sequelize("dbecopoint2","postgres","postgre",{
     host:"localhost",
     dialect:"postgres",
-    models:[Usuario,Recompesa,Consejos,Comentario,Notifiacion,Objetivo,Objetivo_Usuario,Punto_Usuario,Punto,Usuario_Usuario]
+    models:[Usuario,Recompesa,Consejos,Comentario,Notifiacion,Objetivo,Objetivo_Usuario,Punto_Usuario,Punto,Usuario_Usuario,Usuario_Recompesa,CategoriaPunto]
 })
 
 

@@ -10,6 +10,7 @@ import Comentario from '../../models/Comentario';
 import Consejos from '../../models/Consejo';
 import { Op } from "sequelize";
 import Sequelize from "sequelize";
+import Usuario_Recompesa from '../../models/Usuario_Recompesa';
 
 class UsuarioController {
 
@@ -284,9 +285,9 @@ class UsuarioController {
         })
     
         
-        const recompesaobtenidas=await Recompesa.count({
+        const recompesaobtenidas=await Usuario_Recompesa.count({
           where:{
-            idUsuario:id,
+            UsuarioId:id,
           }
         })
     

@@ -32,10 +32,20 @@ class ObjetivoController {
           console.log('El objetivo ya está completo.');
           return;
         }
+
+        let res;
+
+        if (cantidad <= total) {
+          res = Math.round((cantidad / total) * 100);
+        }
+
+        else{
+          res = 100;
+        }
+
       
-        let res = (cantidad / total) * 100;
       
-        if (res >= 99.9) {
+        if (res! >= 99.9) {
           try {
             const objetivo:any= await Objetivo.findOne({ where: { id: ObjetivoId } });
             const usuario:any = await Usuario.findOne({ where: { id: UsuarioId } });
@@ -182,7 +192,7 @@ class ObjetivoController {
         
             const comentarios=await Comentario.count({
               where:{
-                idusuario:id,
+                idUsuario:id,
                 idamigo:null,
                 fecha:fechaHoySinHora
               }
@@ -228,8 +238,8 @@ class ObjetivoController {
             })
         
             if(puntosrealizado>0 || amigos>0){
-              await ObjetivoController.actualizarobjetivos(8,id,puntosrealizado,6);
-              await ObjetivoController.actualizarobjetivos(9,id,amigos,3);
+              await ObjetivoController.actualizarobjetivos(7,id,puntosrealizado,6);
+              await ObjetivoController.actualizarobjetivos(8,id,amigos,3);
               return res.status(201).json({ mensaje: 'Objetivos Actualizados', res: true});
             }else{
               return res.status(201).json({ mensaje: 'Objetivos no actualizados', res: false});

@@ -8,6 +8,7 @@ import Objetivo_Usuario from "./Objetivo_Usuario";
 import Punto from "./Punto";
 import Punto_Usuario from "./Punto_Usuario";
 import Usuario_Usuario from "./Usuario_Usuario";
+import Usuario_Recompesa from "./Usuario_Recompesa";
 
 @Table({ tableName: "Usuario" })
 export class Usuario extends Model {
@@ -36,7 +37,7 @@ export class Usuario extends Model {
     rol!: string;
 
     // Relación hasMany con Recompesa
-    @HasMany(() => Recompesa)
+    @BelongsToMany(() => Recompesa,()=>Usuario_Recompesa)
     recompensas!: Recompesa[];
 
     // Relación hasMany con Consejos

@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import Punto_Usuario from '../../models/Punto_Usuario';
 import Usuario from '../../models/Usuario';
 import qrcode from 'qrcode';
+import CategoriaPunto from '../../models/CategoriaPunto';
 
 const puntajesPorTipo: { [key: string]: number } = {
   "Papel": 2,
@@ -21,7 +22,7 @@ class PuntodereciclajeController {
    
     public async obtenerpuntos(req: Request, res: Response): Promise<Response> {
         try{
-            const Allpunto=await Punto.findAll({})
+            const Allpunto=await Punto.findAll({include:{model:CategoriaPunto}})
         
             return res.status(201).json({ mensaje: "Puntos obtenidos correctamente",res: true , data: Allpunto, });
         
@@ -48,7 +49,7 @@ class PuntodereciclajeController {
                 id: {
                   [Op.in]: puntoIds
                 }
-              }
+              },include:{model:CategoriaPunto}
             });
         
             return res.status(201).json({ mensaje: "Operación exitosa", res: true,data: puntos });
@@ -94,10 +95,7 @@ class PuntodereciclajeController {
 
     public async realizarpunto(req: Request, res: Response): Promise<Response> {
         const {idu,id,tipo,punto}=req.body;
-        console.log("id Usuario:"+idu);
-        console.log("Id punto:"+id);
-        console.log(tipo);
-        console.log(punto)
+       
         try {
             
         
@@ -116,10 +114,21 @@ class PuntodereciclajeController {
           }
     }
 
-    private static calcularPuntajeNuevo(usuario: any, tipo: string, cantidad: number): number {
-      const factor = puntajesPorTipo[tipo];
-      if (factor) {
-        return usuario.puntaje + (cantidad * factor);
+    private  static async calcularPuntajeNuevo (usuario: any, tipo: string, cantidad: number): Promise<number> {
+
+      const categorias=await CategoriaPunto.findOne({
+        where:{
+          tipo:tipo
+        }
+      });
+
+      if(!categorias){
+        return usuario.puntaje+ 0;
+      }
+      
+      if (categorias) {
+        console.log("Valor:"+categorias.valor);
+        return usuario.puntaje + (cantidad * categorias.valor);
       } else {
         throw new Error(`Tipo desconocido: ${tipo}`);
       }
@@ -128,8 +137,7 @@ class PuntodereciclajeController {
     public async puntorealizadoqr(req: Request, res: Response): Promise<Response> {
 
         const {lugar,lugarseleccionado,latitud,longitud,tipo,id,cantidad}=req.body;
-        console.log(lugar);
-        console.log(lugarseleccionado);
+       
         try{
       
             if(lugarseleccionado===lugar){
@@ -137,8 +145,7 @@ class PuntodereciclajeController {
                 where:{
                   latitud:latitud,
                   longitud:longitud,
-                  lugar:lugar,
-                  tipo:tipo
+                  lugar:lugar
                 }
                 
               })
@@ -158,7 +165,7 @@ class PuntodereciclajeController {
                 return res.status(404).json({ mensaje: "Usuario no encontrado", res: false });
               }
         
-              const puntajenuevo=PuntodereciclajeController.calcularPuntajeNuevo(usuario,tipo,cantidad);
+              const puntajenuevo=await PuntodereciclajeController.calcularPuntajeNuevo(usuario,tipo,cantidad);
               
       
               const usuarioActualizado = await Usuario.update(
@@ -231,13 +238,23 @@ class PuntodereciclajeController {
             });
         
             const qrCodeBase64 = await qrcode.toDataURL(qrCodeData);
+
+            const categoria=await CategoriaPunto.findOne({
+              where:{
+                tipo:tipo
+              }
+            })
+
+            if(!categoria){
+              return res.status(201).json({ mensaje: "No existe la categoria", res: false})
+            }
         
             const newpunto = await Punto.create({
               latitud: latitud,
               longitud: longitud,
               lugar: lugar,
               codigoqr: qrCodeBase64,
-              tipo:tipo
+              idCategoria:categoria.id
             });
         
             return res.status(201).json({
@@ -249,6 +266,53 @@ class PuntodereciclajeController {
             console.error('Error al crear punto: ', e);
             return res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
           }
+    }
+
+    public async agregarcategoria(req:Request,res:Response):Promise<Response>{
+      try{
+        const {tipo,valor}=req.body;
+        const categoria=await CategoriaPunto.create({
+          tipo:tipo,
+          valor:valor
+        })
+
+        return res.status(201).json({
+          mensaje: 'Categoria creada',
+          res: true,
+          data: categoria 
+        });
+
+
+      }catch(e){
+        console.error('Error al crear punto: ', e);
+        return res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
+      }
+    }
+
+
+    public async obtenercategorias(req:Request,res:Response):Promise<Response>{
+      try{
+        const categorias=await CategoriaPunto.findAll({});
+        if (categorias.length === 0) {
+          return res.status(404).json({
+            mensaje: 'No se encontraron categorías',
+            res: false,
+            data: categorias 
+          });
+        }
+    
+        return res.status(200).json({
+          mensaje: 'Categorías encontradas',
+          res: true,
+          data: categorias
+        });
+
+
+        
+      }catch(e){
+        console.error('Error al crear punto: ', e);
+        return res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
+      }
     }
 
 

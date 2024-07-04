@@ -3,6 +3,7 @@ import Recompesa from '../../models/Recompesa';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import Usuario from '../../models/Usuario';
+import Usuario_Recompesa from '../../models/Usuario_Recompesa';
 
 
 class RecompesaController {
@@ -54,19 +55,37 @@ class RecompesaController {
                     },
                     fechaFin: {
                         [Op.gte]: fechaHoySinHora // fechaFin >= fechaHoySinHora
+                    },
+                    stock: {
+                        [Op.ne]: 0 // stock != 0
                     }
                 }
             });
+
+
+            const usuario_recompesa=await Usuario_Recompesa.findOne({
+                where:{
+                    UsuarioId:id
+                }
+            })
+
+            if(usuario_recompesa){
+                return res.status(201).json({mensaje:"Ya has ganado una recompensa",res:true})
+            }
+
+            
       
             if (recompensa) {
-                if (recompensa.idUsuario === id) {
-                    return res.status(201).json({ mensaje: 'Recompensa ya obtenida por este usuario', res: true });
-                } else if (recompensa.idUsuario !== null) {
-                    return res.status(201).json({ mensaje: 'Recompensa ya obtenida por otro usuario', res: true});
-                } else {
+                
                     if (usuario.puntaje >= recompensa.puntaje) {
+
+                        await Usuario_Recompesa.create({
+                                UsuarioId:usuario.id,
+                                RecompesaId:recompensa.id
+                            
+                        })
                         await Recompesa.update({
-                            idUsuario: usuario.id
+                            stock:recompensa.stock-1
                         }, {
                             where: {
                                 id: recompensa.id
@@ -78,7 +97,7 @@ class RecompesaController {
                     } else {
                         return res.status(201).json({ mensaje: 'Recompensa no obtenida, puntaje insuficiente', res: false });
                     }
-                }
+                
             } else {
                 return res.status(201).json({ mensaje: 'No hay recompensas disponibles', res: false });
             }
@@ -89,7 +108,7 @@ class RecompesaController {
     }
 
     public async agregarecompesa(req: Request, res: Response): Promise<Response> {
-        const {fechainicio,fechafin,imagen,des,puntaje}=req.body;
+        const {fechainicio,fechafin,imagen,des,puntaje,stock}=req.body;
         try {
             const fechaInicio = new Date(fechainicio);
             const fechaFin = new Date(fechafin);
@@ -103,7 +122,8 @@ class RecompesaController {
               des: des,
               fechaInicio: fechaInicioISO,
               fechaFin:fechaFinISO,
-              puntaje:puntaje
+              puntaje:puntaje,
+              stock:stock
             });
         
             return res.status(201).json({ mensaje: 'Recompensa agregada con éxito', res: true, data:nuevaRecompensa });
@@ -132,6 +152,56 @@ class RecompesaController {
             return res.json(500).json({ mensaje: 'Error interno en el servidor', res: false });
         }
     }
+
+    public async eliminarid(req:Request,res:Response):Promise<Response>{
+        try{
+            const {id}=req.body;
+
+            const usuario_recompesa=await Usuario_Recompesa.destroy({
+                where:{
+                    id:id
+                }
+            })
+
+            return res.status(201).json({ mensaje: 'Recompensa eliminada', res: true });
+
+
+             
+
+
+
+
+
+        }catch(e){
+            return res.status(500).json({mensaje:'Error interno en el servidor',res:false})
+        }
+    }
+
+    public async actualizarstock(req:Request,res:Response):Promise<Response>{
+        try{
+            const {id,stock}=req.body;
+
+            const usuario_recompesa = await Recompesa.update(
+                { stock: stock }, // objeto de actualización
+                { where: { id: id } } // opciones, incluyendo la condición `where`
+              );
+              
+
+            return res.status(201).json({ mensaje: 'Recompensa actualizada', res: true });
+
+
+             
+
+
+
+
+
+        }catch(e){
+            return res.status(500).json({mensaje:'Error interno en el servidor',res:false})
+        }
+    }
+
+    
 
 
 
