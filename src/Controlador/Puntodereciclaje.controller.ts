@@ -270,10 +270,11 @@ class PuntodereciclajeController {
 
     public async agregarcategoria(req:Request,res:Response):Promise<Response>{
       try{
-        const {tipo,valor}=req.body;
+        const {tipo,valor,puntuacion}=req.body;
         const categoria=await CategoriaPunto.create({
           tipo:tipo,
-          valor:valor
+          valor:valor,
+          puntuacion:puntuacion
         })
 
         return res.status(201).json({

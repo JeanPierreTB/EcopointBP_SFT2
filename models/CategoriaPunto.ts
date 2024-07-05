@@ -15,6 +15,10 @@ export class CategoriaPunto extends Model {
     @Column({ type: DataType.INTEGER })
     valor!: number;
 
+    @Column({ type: DataType.TEXT })
+    puntuacion!: number;
+
+
     // Relación hasMany con Notifiacion
     @HasMany(() => Punto)
     puntos!: Punto[];
