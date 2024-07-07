@@ -228,6 +228,11 @@ class PuntodereciclajeController {
 
     public async agregarpunto(req: Request, res: Response): Promise<Response> {
         const {latitud,longitud,lugar,tipo}=req.body;
+
+        if (!latitud || !longitud || !lugar || !tipo) {
+          return res.status(400).json({ mensaje: 'Faltan campos obligatorios', res: false });
+      }
+
         try {
     
             const qrCodeData = JSON.stringify({
@@ -246,7 +251,7 @@ class PuntodereciclajeController {
             })
 
             if(!categoria){
-              return res.status(201).json({ mensaje: "No existe la categoria", res: false})
+              return res.status(400).json({ mensaje: "No existe la categoria", res: false})
             }
         
             const newpunto = await Punto.create({
@@ -271,6 +276,26 @@ class PuntodereciclajeController {
     public async agregarcategoria(req:Request,res:Response):Promise<Response>{
       try{
         const {tipo,valor,puntuacion}=req.body;
+
+        if (typeof tipo !== 'string' || typeof valor !== 'number' || typeof puntuacion !== 'string') {
+          return res.status(400).json({ mensaje: 'Los campos estan en formato invalido',res:false });
+      }
+
+
+        if(puntuacion!=="kilo"&& puntuacion!=="Cantidad"){
+          return res.status(400).json({ mensaje: "La puntuacion no esta permitida", res: false})
+
+        }
+
+        const categoriaexiste=await CategoriaPunto.findOne({
+          where:{
+            tipo:tipo
+          }
+        })
+
+        if(categoriaexiste){
+          return res.status(400).json({ mensaje: "La categoria ya existe", res: false})
+        }
         const categoria=await CategoriaPunto.create({
           tipo:tipo,
           valor:valor,

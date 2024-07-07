@@ -109,13 +109,31 @@ class RecompesaController {
 
     public async agregarecompesa(req: Request, res: Response): Promise<Response> {
         const {fechainicio,fechafin,imagen,des,puntaje,stock}=req.body;
+
+
+        if (!fechainicio || !fechafin || !imagen || !des || !puntaje || !stock) {
+            return res.status(400).json({ mensaje: 'Faltan campos obligatorios', res: false });
+        }
         try {
+
+            
             const fechaInicio = new Date(fechainicio);
             const fechaFin = new Date(fechafin);
         
             // Obtener solo la parte de la fecha en formato ISO8601 (YYYY-MM-DD)
             const fechaInicioISO = fechaInicio.toISOString().split('T')[0];
             const fechaFinISO = fechaFin.toISOString().split('T')[0];
+
+            const recompesa=await Recompesa.findOne({
+                where:{
+                    fechaInicio: fechaInicioISO,
+                    fechaFin:fechaFinISO,
+                }
+            })
+
+            if(recompesa){
+                return res.status(400).json({ mensaje: 'Recompensa ya existe', res:false})
+            }
             
             const nuevaRecompensa = await Recompesa.create({
               imagen: imagen,
@@ -128,7 +146,6 @@ class RecompesaController {
         
             return res.status(201).json({ mensaje: 'Recompensa agregada con éxito', res: true, data:nuevaRecompensa });
           } catch (e) {
-            console.error('Error al agregar recompensa:', e);
             return res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
           }
     }

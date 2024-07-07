@@ -76,8 +76,14 @@ const verificardia= async()=>{
 
 
 
-app.listen(PORT, () => {
+// Exportar la app sin iniciar el servidor
+export default app;
+
+// Solo iniciar el servidor si no es un módulo de prueba
+if (require.main === module) {
+  app.listen(PORT, () => {
     console.log(`Servidor Express escuchando en el puerto ${PORT}`);
     verificarconexion();
     verificardia();
-});
+  });
+}

@@ -41,6 +41,16 @@ class UsuarioController {
       const { nombre, contrasena, dni, ntelefono, rol } = req.body; // Obtener datos del cuerpo de la solicitud
       console.log("Body:" + req.body.rol);
 
+      const usuario = await Usuario.findOne({
+        where: {
+            nombre:nombre
+        }
+    });
+
+      if(usuario){
+        return res.status(400).json({mensaje:'Usuario ya existe',res:false})
+      }
+
       // Realizar la verificación de los datos
       const validacionExitosa = UsuarioController.verificacion({ nombre, contrasena, dni, ntelefono });
       if (!validacionExitosa) {
@@ -60,6 +70,7 @@ class UsuarioController {
         // Obtener todos los objetivos
         const objetivos = await Objetivo.findAll();
 
+        
         // Crear registros en la tabla Objetivo_Usuario
         const registrosObjetivoUsuario = objetivos.map((objetivo: any) => ({
           UsuarioId: usuarioCreado.id,
@@ -79,7 +90,6 @@ class UsuarioController {
 
       return res.status(201).json({ mensaje: 'Usuario creado', res: true });
     } catch (error) {
-      console.error('Error al insertar el usuario: ', error);
       return res.status(500).json({ error: 'Error interno en el servidor' });
     }
   }
@@ -192,6 +202,10 @@ class UsuarioController {
     try {
       const { id, nombre, contrasena, dni, ntelefono } = req.body;
 
+      if (!id || !nombre || !contrasena || !dni || !ntelefono) {
+        return res.status(400).json({ mensaje: 'Faltan campos obligatorios', res: false });
+    }
+
       // Validar los datos del usuario
       const validacionExitosa = UsuarioController.verificacion({ nombre, contrasena, dni, ntelefono });
       if (!validacionExitosa) {
@@ -233,7 +247,6 @@ class UsuarioController {
         return res.status(404).json({ mensaje: 'El usuario no existe', res: false });
       }
     } catch (e) {
-      console.error('Error al realizar la operación: ', e);
       return res.status(500).json({ mensaje: 'Error interno en el servidor', res: false });
     }
   }
