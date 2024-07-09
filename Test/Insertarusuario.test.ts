@@ -3,7 +3,7 @@ import app from '../app';
 
 
 describe('POST /insertar-usuario- Prueba de caja blanca', () => {
-    /*test('debería retornar un estado de 201 y crear un usuario con rol "Admi"', async () => {
+    test('debería retornar un estado de 201 y crear un usuario con rol "Admi"', async () => {
         const nuevoUsuario = {
           nombre: 'lg@gmail.com',
           contrasena: 'contra12',
@@ -19,7 +19,7 @@ describe('POST /insertar-usuario- Prueba de caja blanca', () => {
         expect(response.status).toBe(201);
         expect(response.body.mensaje).toBe('Usuario creado');
         expect(response.body.res).toBe(true);
-      });*/
+      });
 
     test('prueba de usuario existen',async ()=>{
         const nuevoUsuario = {
@@ -40,7 +40,7 @@ describe('POST /insertar-usuario- Prueba de caja blanca', () => {
     });
 
 
-    /*test('debería retornar un estado de 201 y crear un usuario normal', async () => {
+    test('debería retornar un estado de 201 y crear un usuario normal', async () => {
         const nuevoUsuario = {
           nombre: 'samgumg@gmail.com',
           contrasena: 'contra12',
@@ -55,13 +55,13 @@ describe('POST /insertar-usuario- Prueba de caja blanca', () => {
         expect(response.status).toBe(201);
         expect(response.body.mensaje).toBe('Usuario creado');
         expect(response.body.res).toBe(true);
-      });*/
+      });
    
   });
 
 
 
-  /*
+  
   
 describe('POST /insert-usuario- Prueba de caja negra',()=>{
     test('debería crear un usuario con éxito', async () => {
@@ -123,5 +123,5 @@ describe('POST /insert-usuario- Prueba de caja negra',()=>{
 
 
 
-})*/
+})
 

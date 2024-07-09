@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../app';
 
-/*
+
 describe('POST /agregar-categoria-Prueba de caja blanca ',()=>{
     test('deberia retornar 201 porque se agrega una nueva categoria ',async()=>{
         const nuevacategoria={
@@ -42,7 +42,7 @@ describe('POST /agregar-categoria-Prueba de caja blanca ',()=>{
 
 
 
-})*/
+})
 
 
 

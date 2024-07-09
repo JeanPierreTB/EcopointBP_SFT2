@@ -3,12 +3,12 @@ import app from '../app';
 
 
 describe('POST /agregar-recompesa-Prueba de caja blanca ',()=>{
-    /*test('deberia retornar un estado de 201 por agregar una recompesa',async ()=>{
+    test('deberia retornar un estado de 201 por agregar una recompesa',async ()=>{
         const nuevaRecompensa = {
-            fechainicio:'2024-07-08',
-            fechafin:'2024-08-14',
+            fechainicio:'2024-07-22',
+            fechafin:'2024-07-28',
             imagen: 'https://publicorpmerch.com/wp-content/uploads/2023/02/CASACA-TERMICAS-e1615399942699.jpg',
-            des: "Casa Industrial",
+            des: "Casaca Industrial",
             puntaje:1500,
             stock:2
         }
@@ -39,7 +39,7 @@ describe('POST /agregar-recompesa-Prueba de caja blanca ',()=>{
         expect(response.body.mensaje).toBe("Recompensa ya existe");
         expect(response.body.res).toBe(false);
 
-    })*/
+    })
 
 
 })

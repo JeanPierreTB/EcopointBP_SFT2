@@ -227,32 +227,42 @@ class PuntodereciclajeController {
 
 
     public async agregarpunto(req: Request, res: Response): Promise<Response> {
+      //2
         const {latitud,longitud,lugar,tipo}=req.body;
 
+        //3
         if (!latitud || !longitud || !lugar || !tipo) {
+          //4
           return res.status(400).json({ mensaje: 'Faltan campos obligatorios', res: false });
       }
 
         try {
-    
+            //5
             const qrCodeData = JSON.stringify({
               latitud: latitud,
               longitud: longitud,
               lugar: lugar,
               tipo:tipo
             });
-        
+            
+            //6
             const qrCodeBase64 = await qrcode.toDataURL(qrCodeData);
 
+            //7
             const categoria=await CategoriaPunto.findOne({
               where:{
                 tipo:tipo
               }
             })
 
+            //8
+
             if(!categoria){
+              //9
               return res.status(400).json({ mensaje: "No existe la categoria", res: false})
             }
+
+            //10
         
             const newpunto = await Punto.create({
               latitud: latitud,
@@ -261,7 +271,8 @@ class PuntodereciclajeController {
               codigoqr: qrCodeBase64,
               idCategoria:categoria.id
             });
-        
+            
+            //11
             return res.status(201).json({
               mensaje: 'Punto creado',
               res: true,
@@ -275,32 +286,49 @@ class PuntodereciclajeController {
 
     public async agregarcategoria(req:Request,res:Response):Promise<Response>{
       try{
+        //2
         const {tipo,valor,puntuacion}=req.body;
 
+        console.log(tipo);
+        console.log(valor);
+        console.log(puntuacion)
+        //3
         if (typeof tipo !== 'string' || typeof valor !== 'number' || typeof puntuacion !== 'string') {
+          //4
           return res.status(400).json({ mensaje: 'Los campos estan en formato invalido',res:false });
       }
 
+        //5
+        if(puntuacion!=="Kilo" && puntuacion!=="Cantidad"){
+          //6
+          console.log("eNTRO")
+          console.log(puntuacion)
 
-        if(puntuacion!=="kilo"&& puntuacion!=="Cantidad"){
           return res.status(400).json({ mensaje: "La puntuacion no esta permitida", res: false})
 
         }
+        console.log("Hola")
 
+        //7
         const categoriaexiste=await CategoriaPunto.findOne({
           where:{
             tipo:tipo
           }
         })
 
+        //8
         if(categoriaexiste){
+          //9
           return res.status(400).json({ mensaje: "La categoria ya existe", res: false})
         }
+        //10
         const categoria=await CategoriaPunto.create({
           tipo:tipo,
           valor:valor,
           puntuacion:puntuacion
         })
+
+        //11
 
         return res.status(201).json({
           mensaje: 'Categoria creada',

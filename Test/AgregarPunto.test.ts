@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../app';
 
-/*
+
 describe('POST /agregar-punto-Prueba de caja blanca ',()=>{
     test('deberia retornar 201 porque se crea un nuevo punto',async ()=>{
         const nuevopunto={
@@ -42,7 +42,7 @@ describe('POST /agregar-punto-Prueba de caja blanca ',()=>{
 
 
 
-})*/
+})
 
 
 

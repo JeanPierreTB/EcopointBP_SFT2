@@ -2,11 +2,11 @@ import request from 'supertest';
 import app from '../app';
 
 
-/*
+
 describe('POST /actualizar-datos-usuario Prueba de caja blanca ',()=>{
     test('debería retornar un estado de 200 y actualizar datos usuario convencional',async()=>{
         const nuevosDatos = {
-            id:18,
+            id:2,
             nombre: 'lapicero@gmail.com',
             contrasena: '9contra2',
             dni: 82345678,
@@ -26,8 +26,8 @@ describe('POST /actualizar-datos-usuario Prueba de caja blanca ',()=>{
 
     test('debería retornar un estado de 200 y actualizar datos usuario google',async()=>{
         const nuevosDatos = {
-            id:4,
-            nombre: 'gokualter@gmail.com',
+            id:1,
+            nombre: '20203703@aloe.ulima.edu.pe',
             contrasena: 'Indefinido',
             dni: 22345678,
             ntelefono: 387654321
@@ -64,7 +64,7 @@ describe('POST /actualizar-datos-usuario Prueba de caja blanca ',()=>{
     })
 
     
-})*/
+})
 
 
 
